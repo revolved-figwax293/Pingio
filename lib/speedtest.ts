@@ -46,9 +46,13 @@ function trimmedMean(values: number[], trimFraction = 0.1): number {
 
 export class SpeedTestEngine {
   private aborted = false;
+  private dlAbortController: AbortController | null = null;
 
   abort() {
     this.aborted = true;
+    if (this.dlAbortController) {
+      this.dlAbortController.abort();
+    }
   }
 
   async measurePing(): Promise<{ ping: number; jitter: number; samples: LatencyDataPoint[] }> {
@@ -60,7 +64,7 @@ export class SpeedTestEngine {
       try {
         const start = performance.now();
         const res = await fetch(
-          `https://speed.cloudflare.com/__down?bytes=0&r=${Date.now()}`,
+          `/api/download?bytes=0&r=${Date.now()}`,
           { method: "GET", cache: "no-store", mode: "cors" }
         );
         await res.arrayBuffer();
@@ -101,54 +105,104 @@ export class SpeedTestEngine {
     const TEST_DURATION = 12000; // 12 sec
     const startTime = performance.now();
     let peakSpeed = 0;
-    // Progressive chunk sizes
-    const chunkSizes = [512_000, 1_000_000, 5_000_000, 10_000_000, 25_000_000];
-    let chunkIdx = 0;
 
-    while (performance.now() - startTime < TEST_DURATION && !this.aborted) {
-      const bytes = chunkSizes[Math.min(chunkIdx, chunkSizes.length - 1)];
-      const url = `https://speed.cloudflare.com/__down?bytes=${bytes}&_=${Date.now()}`;
+    const CONCURRENCY = 3;
+    const CHUNK_SIZE = 50_000_000; // 50MB per request to prevent reconnect loops on fast connections
+    this.dlAbortController = new AbortController();
+    const abortController = this.dlAbortController;
 
-      try {
-        const fetchStart = performance.now();
-        const response = await fetch(url, {
-          cache: "no-store",
-          mode: "cors",
-        });
+    const connectionBytes = new Map<number, number>();
+    let completedBytes = 0;
+    let lastProgressTime = 0; // Shared timestamp to throttle UI updates
 
-        if (!response.body) throw new Error("No body");
-        const reader = response.body.getReader();
-        let bytesReceived = 0;
+    const timeoutId = setTimeout(() => {
+      abortController.abort();
+    }, TEST_DURATION);
 
-        while (!this.aborted) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          bytesReceived += value.byteLength;
+    const runStream = async (connectionId: number) => {
+      while (
+        performance.now() - startTime < TEST_DURATION &&
+        !abortController.signal.aborted &&
+        !this.aborted
+      ) {
+        const url = `/api/download?bytes=${CHUNK_SIZE}&_=${Date.now()}_${connectionId}`;
+        try {
+          const response = await fetch(url, {
+            cache: "no-store",
+            mode: "cors",
+            signal: abortController.signal,
+          });
 
-          const elapsed = (performance.now() - fetchStart) / 1000;
-          if (elapsed > 0.05) {
-            const speed = (bytesReceived * 8) / elapsed / 1e6;
-            if (speed > 0.01 && speed < 50_000) {
-              samples.push({ time: Date.now(), speed });
-              readings.push(speed);
-              peakSpeed = Math.max(peakSpeed, speed);
-              const progress = Math.min(
-                ((performance.now() - startTime) / TEST_DURATION) * 100,
-                99
-              );
-              onProgress(speed, samples, progress);
+          if (!response.body) throw new Error("No body");
+          const reader = response.body.getReader();
+          connectionBytes.set(connectionId, 0);
+
+          while (!this.aborted && !abortController.signal.aborted) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const currentBytes = connectionBytes.get(connectionId) || 0;
+            const newBytes = currentBytes + value.byteLength;
+            connectionBytes.set(connectionId, newBytes);
+
+            const now = performance.now();
+            const elapsedSinceStart = (now - startTime) / 1000;
+            if (elapsedSinceStart >= TEST_DURATION / 1000) {
+              abortController.abort();
+              break;
+            }
+
+            // Throttle UI rendering and state updates to once every 100ms (10 times per second)
+            if (now - lastProgressTime > 100 && elapsedSinceStart > 0.05) {
+              lastProgressTime = now;
+
+              let totalBytes = completedBytes;
+              connectionBytes.forEach((bytes) => {
+                totalBytes += bytes;
+              });
+
+              const speed = (totalBytes * 8) / elapsedSinceStart / 1e6;
+              if (speed > 0.01 && speed < 50_000) {
+                samples.push({ time: Date.now(), speed });
+                readings.push(speed);
+                peakSpeed = Math.max(peakSpeed, speed);
+                const progress = Math.min(
+                  (elapsedSinceStart / (TEST_DURATION / 1000)) * 100,
+                  99
+                );
+                onProgress(speed, samples, progress);
+              }
             }
           }
+
+          const finalBytes = connectionBytes.get(connectionId) || 0;
+          completedBytes += finalBytes;
+          connectionBytes.set(connectionId, 0);
+        } catch {
+          if (abortController.signal.aborted || this.aborted) {
+            break;
+          }
+          await new Promise((resolve) => setTimeout(resolve, 200));
         }
-        chunkIdx++;
-      } catch {
-        await new Promise((r) => setTimeout(r, 300));
-        chunkIdx = 0;
       }
+    };
+
+    const streamPromises = [];
+    for (let i = 0; i < CONCURRENCY; i++) {
+      streamPromises.push(runStream(i));
     }
 
+    try {
+      await Promise.all(streamPromises);
+    } finally {
+      clearTimeout(timeoutId);
+      this.dlAbortController = null;
+    }
+
+    const finalAvgSpeed = readings.length > 0 ? trimmedMean(readings, 0.15) : 0;
+
     return {
-      avgSpeed: trimmedMean(readings, 0.15),
+      avgSpeed: finalAvgSpeed,
       peakSpeed,
       samples,
     };

@@ -31,7 +31,7 @@ export function ResultCard() {
 
   const copyResults = async () => {
     const text = [
-      "── PulseTest Results ──",
+      "── Pingio Test Results ──",
       `Download : ${fmtSpeed(lastResult.download)}`,
       `Upload   : ${fmtSpeed(lastResult.upload)}`,
       `Ping     : ${formatLatency(lastResult.ping)}`,
@@ -62,7 +62,7 @@ export function ResultCard() {
         logging: false,
       });
       const link = document.createElement("a");
-      link.download = `pulsetest-${Date.now()}.png`;
+      link.download = `pingio-test-${Date.now()}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
     } catch (e) {
@@ -75,7 +75,7 @@ export function ResultCard() {
     const blob = new Blob([data], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.download = `pulsetest-${Date.now()}.json`;
+    link.download = `pingio-test-${Date.now()}.json`;
     link.href = url;
     link.click();
     URL.revokeObjectURL(url);

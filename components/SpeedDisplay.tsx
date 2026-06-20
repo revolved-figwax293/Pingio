@@ -100,16 +100,16 @@ export function SpeedDisplay({ onStart, onStop }: SpeedDisplayProps) {
   const dlDashoffset = dlArcLength - (dlRatio * dlArcLength);
   const dlAngle = 126 + dlRatio * 288;
   const dlRad = (dlAngle * Math.PI) / 180;
-  const dlDotX = 180 + 140 * Math.cos(dlRad);
-  const dlDotY = 180 + 140 * Math.sin(dlRad);
+  const dlDotX = Number((180 + 140 * Math.cos(dlRad)).toFixed(3));
+  const dlDotY = Number((180 + 140 * Math.sin(dlRad)).toFixed(3));
 
   const ulRatio = speedToRatio(animatedUl);
   const ulArcLength = 603.18; // 288 degrees of R=120 circle
   const ulDashoffset = ulArcLength - (ulRatio * ulArcLength);
   const ulAngle = 126 + ulRatio * 288;
   const ulRad = (ulAngle * Math.PI) / 180;
-  const ulDotX = 180 + 120 * Math.cos(ulRad);
-  const ulDotY = 180 + 120 * Math.sin(ulRad);
+  const ulDotX = Number((180 + 120 * Math.cos(ulRad)).toFixed(3));
+  const ulDotY = Number((180 + 120 * Math.sin(ulRad)).toFixed(3));
 
   // Active speed for ticks/labels highlighting
   const activeSpeedForTicks = isDl 
@@ -133,10 +133,10 @@ export function SpeedDisplay({ onStart, onStop }: SpeedDisplayProps) {
     const isTickActive = activeSpeedForTicks >= stepVal && activeSpeedForTicks > 0;
     
     ticks.push({
-      x1: 180 + 146 * Math.cos(rad),
-      y1: 180 + 146 * Math.sin(rad),
-      x2: 180 + 153 * Math.cos(rad),
-      y2: 180 + 153 * Math.sin(rad),
+      x1: Number((180 + 146 * Math.cos(rad)).toFixed(3)),
+      y1: Number((180 + 146 * Math.sin(rad)).toFixed(3)),
+      x2: Number((180 + 153 * Math.cos(rad)).toFixed(3)),
+      y2: Number((180 + 153 * Math.sin(rad)).toFixed(3)),
       isTickActive,
       angle,
       text: stepVal.toString(),
@@ -240,8 +240,8 @@ export function SpeedDisplay({ onStart, onStop }: SpeedDisplayProps) {
           {ticks.map((t, idx) => {
             const rad = (t.angle * Math.PI) / 180;
             // Radius for text positioning
-            const lx = 180 + 166 * Math.cos(rad);
-            const ly = 180 + 166 * Math.sin(rad);
+            const lx = Number((180 + 166 * Math.cos(rad)).toFixed(3));
+            const ly = Number((180 + 166 * Math.sin(rad)).toFixed(3));
             return (
               <text
                 key={idx}
