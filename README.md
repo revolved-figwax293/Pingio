@@ -40,13 +40,9 @@ Unlike traditional speed testing tools that are cluttered with heavy display adv
 
 ---
 
-## 📸 Screenshots
+## 📸 Application Showcase
 
-| ⚡ Speed Test Running | 📊 Results Dashboard |
-| :---: | :---: |
-| ![Pingio Running Dashboard](public/pingio-speedometer-running.png) <br> *Speed Test in Progress with Real-time Gauges* | ![Pingio Results Page](public/pingio-dashboard.png) <br> *Comprehensive Results Dashboard with Insights* |
-| **📁 Local History & Diagnostics** | **🖼️ Exportable Diagnostic Card** |
-| ![Pingio Test History List](public/pingio-history-modal.png) <br> *IndexedDB Local Test History & Actions* | ![Pingio Diagnostic Card](public/pingio-diagnostic-card.png) <br> *Unified Square Shareable Speed Report* |
+![Pingio Multi-Device Responsive Showcase](public/pingio-device-mockup.png)
 
 ---
 
@@ -199,6 +195,6 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ## 👤 Author
 
 **Rashid Ali**
-* **Portfolio:** [rashidbuilds.com](https://rashidbuilds.com)
+* **Portfolio:** [rashidbuilds.com](https://www.rashidbuilds.com)
 * **GitHub:** [@rashidbuilds](https://github.com/rashidbuilds)
 * **Twitter:** [@rashidbuilds](https://twitter.com/rashidbuilds)

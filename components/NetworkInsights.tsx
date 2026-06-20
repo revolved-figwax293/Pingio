@@ -103,7 +103,7 @@ export function NetworkInsights() {
         </div>
 
         {/* Bottom bar with additional insights and Current IP */}
-        <div className="px-4 py-2.5 bg-muted/20 border-t border-border/25 flex items-center justify-between text-xs text-muted-foreground">
+        <div className="px-4 py-2.5 bg-muted/20 border-t border-border/25 flex md:items-center justify-between md:flex-row flex-col text-xs text-muted-foreground">
           <div className="flex gap-4">
             {insights.slice(4).map((item) => (
               <div key={item.label} className="flex items-center gap-1">
