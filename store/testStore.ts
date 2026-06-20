@@ -109,7 +109,7 @@ export const useTestStore = create<TestState>((set) => ({
       currentUpload: result.upload,
       currentPing: result.ping,
       currentJitter: result.jitter,
-      history: [result, ...state.history],
+      history: [result, ...state.history].slice(0, 10),
     })),
 
   resetTest: () =>

@@ -16,20 +16,25 @@ export function Header() {
     >
       <div className="max-w-7xl mx-auto px-5 sm:px-8 h-[80px] flex items-center justify-between">
         {/* Left — Logo + Name */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center">
           <div className="w-10 h-10 flex items-center justify-center">
             <svg viewBox="0 0 24 24" fill="none" className="w-[32px] h-[32px]">
+              <defs>
+                <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#10B981" />
+                  <stop offset="100%" stopColor="#3B82F6" />
+                </linearGradient>
+              </defs>
               <path
                 d="M2 12h3.5l3-8 4 16 3-10 2 2H22"
-                stroke="currentColor"
-                strokeWidth="2"
+                stroke="url(#logoGrad)"
+                strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-primary"
               />
             </svg>
           </div>
-          <h2 className="font-bold text-[28px] tracking-[-0.02em] text-foreground">
+          <h2 className="font-bold text-[28px] tracking-[-0.02em] bg-gradient-to-r from-[#10B981] to-[#3B82F6] bg-clip-text text-transparent">
             Pingio
           </h2>
         </div>

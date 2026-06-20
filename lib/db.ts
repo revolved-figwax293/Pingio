@@ -24,6 +24,15 @@ async function getDB(): Promise<IDBPDatabase<PingioDB>> {
 
 export async function saveResult(result: TestResult): Promise<void> {
   const database = await getDB();
+  
+  // Limit to last 10 records by deleting older ones first
+  const results = await database.getAllFromIndex("results", "by-timestamp");
+  if (results.length >= 10) {
+    const deleteCount = results.length - 9;
+    const toDelete = results.slice(0, deleteCount);
+    await Promise.all(toDelete.map((item) => database.delete("results", item.id)));
+  }
+
   await database.put("results", result);
 }
 

@@ -64,7 +64,7 @@ export class SpeedTestEngine {
       try {
         const start = performance.now();
         const res = await fetch(
-          `/api/download?bytes=0&r=${Date.now()}`,
+          `https://speed.cloudflare.com/__down?bytes=0&r=${Date.now()}`,
           { method: "GET", cache: "no-store", mode: "cors" }
         );
         await res.arrayBuffer();
@@ -102,7 +102,7 @@ export class SpeedTestEngine {
   ): Promise<{ avgSpeed: number; peakSpeed: number; samples: SpeedDataPoint[] }> {
     const samples: SpeedDataPoint[] = [];
     const readings: number[] = [];
-    const TEST_DURATION = 12000; // 12 sec
+    const TEST_DURATION = 10000; // 10 sec (Industry standard)
     const startTime = performance.now();
     let peakSpeed = 0;
 
@@ -125,7 +125,7 @@ export class SpeedTestEngine {
         !abortController.signal.aborted &&
         !this.aborted
       ) {
-        const url = `/api/download?bytes=${CHUNK_SIZE}&_=${Date.now()}_${connectionId}`;
+        const url = `https://speed.cloudflare.com/__down?bytes=${CHUNK_SIZE}&_=${Date.now()}_${connectionId}`;
         try {
           const response = await fetch(url, {
             cache: "no-store",
@@ -213,7 +213,7 @@ export class SpeedTestEngine {
   ): Promise<{ avgSpeed: number; peakSpeed: number; samples: SpeedDataPoint[] }> {
     const samples: SpeedDataPoint[] = [];
     const readings: number[] = [];
-    const TEST_DURATION = 12000; // 12 seconds
+    const TEST_DURATION = 10000; // 10 seconds (Industry standard)
     const startTime = performance.now();
     let peakSpeed = 0;
 
@@ -225,7 +225,7 @@ export class SpeedTestEngine {
     let totalBytesUploadedBeforeCurrent = 0;
     const activeXhrRef: { current: XMLHttpRequest | null } = { current: null };
 
-    // Global timer to guarantee the upload test stops precisely at 12 seconds
+    // Global timer to guarantee the upload test stops precisely at 10 seconds
     const timeoutId = setTimeout(() => {
       if (activeXhrRef.current) {
         activeXhrRef.current.abort();
